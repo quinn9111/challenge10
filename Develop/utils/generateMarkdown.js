@@ -1,19 +1,29 @@
-// TODO: Create a function that returns a license badge based on which license is passed in
-// If there is no license, return an empty string
-function renderLicenseBadge(license) {}
+function generateMarkdown(answers) {
+  return `
+  # ${answers.title}
+  
+  ## Table of Contents
+  * [Description](#description)
+  * [Installation](#instruction)
+  * [Usage](#usage)
+  * [Tests](#test)
+  * [Questions](#Questions)
 
-// TODO: Create a function that returns the license link
-// If there is no license, return an empty string
-function renderLicenseLink(license) {}
-
-// TODO: Create a function that returns the license section of README
-// If there is no license, return an empty string
-function renderLicenseSection(license) {}
-
-// TODO: Create a function to generate markdown for README
-function generateMarkdown(data) {
-  return `# ${data.title}
-
+  ## [Description](#table-of-contents)
+  ${answers.description}
+  ## [Installation](#table-of-contents)
+  ${answers.instructions}
+  ## [Usage](#table-of-contents)
+  ${answers.usage}
+  ## [License](#table-of-contents)
+  ${answers.license}
+  ## [Contribution](#table-of-contents)
+  ${answers.contribution}
+  ## [Tests](#table-of-contents)
+  ${answers.tests}
+  ## [Questions](#table-of-contents)
+  ## GitHub: (https://github.com/${answers.github})
+  ## Email: ${answers.email}
 `;
 }
 
