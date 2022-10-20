@@ -1,75 +1,109 @@
-const inquirer = require("inquirer");
-const generateMarkdown = require('./utils/generateMarkdown.js');
-fs = require('fs');
-const util = require('util');
+const generateHTML = require('./utils/generateHTML');
+const manager = require('./lib/manager');
+const engineer = require('./lib/engineer');
+const intern = require('./lib/intern'); 
+const fs = require('fs'); 
+const inquirer = require('inquirer');
 
-const questions = [
-        {
-            type: 'input',
-            name: 'title',
-            message: 'What is the title of your project?',
-        },
-        {
-            type: 'input',
-            name: 'description',
-            message: 'Provide a brief description of your project.',
-        },
-        {
-            type: 'input',
-            name: 'instructions',
-            message: 'Provide installation instructions for your project.',
-        },
-        {
-            type: 'input',
-            name: 'usage',
-            message: 'Provide usage information of your project.',
-        },
-        {
-            type: 'input',
-            name: 'contribution',
-            message: 'Provide contribution guidelines of your project.',
-        },
-        {
-            type: 'input',
-            name: 'tests',
-            message: 'Provide test instructions of your project.',
-        },
-        {
-            type: 'list',
-            name: 'license',
-            message: 'Which license will you use for your project?',
-            choices: ['AWS', 'Apache', 'Azure', 'No license']
-    },
-    {
-            type: 'input',
-            name: 'github',
-            message: 'Provide your Github user.',
-    },  
-    {
-            type: 'input',
-            name: 'email',
-            message: 'Provide your email address.',
-    },
-    ]
+const teamMember = []; 
 
-    function writeToFile(fileName, answers) {
-        fs.writeFile(fileName, answers, error => {
-          if (error) {
-            return console.log('Sorry there was an error : ' + error);
-          }
-        })
+const newEmployee = () => {
+  return inquirer.prompt ([
+      {
+          name: 'role',
+          type: 'list',
+          message: "What is the role of the employee?",
+          choices: ['Engineer', 'Intern', 'Manager']
+      },
+      {
+          name: 'name',
+          type: 'input',
+          message: "What is the employee's full name?", 
+      },
+      {
+          name: 'id',
+          type: 'input',
+          name: 'id',
+          message: "What is the employee's ID?",
+      },
+      {
+          name: 'emailAddress',
+          type: 'input',
+          message: "What is the employee's email address?",
+      },
+      {   
+        name: 'officeNumber',
+        type: 'input',
+        message: "What is the manager's office number?",
+    },
+      {
+          name: 'github',
+          type: 'input',
+          message: "What is the employee's github username?",
+      },
+      {   
+          name: 'school',
+          type: 'input',
+          message: "What is the intern's school",
+      },
+      {
+        name: 'addAnotherEmployee',
+        type: 'confirm',
+        message: 'Do you have more employees to add?',
+        default: false
+    }
+  ])
+  .then(employeeRecord => {
+
+      let { role, name, id, emailAddress, officeNumber, github, school, addAnotherEmployee } = employeeRecord; 
+      let employee; 
+
+      if (role === "Engineer") {
+          employee = new engineer ( id, name, emailAddress, github);
+
+          console.log(employee);
+      
+
+      } else if (role === "Intern") {
+          employee = new intern ( id, name, emailAddress, school);
+
+          console.log(employee);
+
+      } else if (role === "Manager") {
+        employee = new manager ( id, name, emailAddress, officeNumber);
+
+        console.log(employee);
       }
 
-const createReadMe = util.promisify(writeToFile);
-async function init() {
-  try {
-    const answers = await inquirer.prompt(questions);
-    const readmeFile = generateMarkdown(answers);
-    await createReadMe('README.md', readmeFile);
-    
-  } catch (error) {
 
-  }
+      teamMember.push(employee); 
+
+      if (addAnotherEmployee) {
+        return newEmployee(teamMember); 
+    } else {
+        return teamMember;
+      }
+    })
 };
 
-init();
+const writeFile = data => {
+  fs.writeFile('./index.html', data, err => {
+      if (err) {
+          console.log(err);
+          return;
+      } else {
+          console.log("Your team profile has been successfully created! Please check out the index.html")
+      }
+  })
+}; 
+
+newEmployee()
+  .then(teamMember => {
+    return generateHTML(teamMember);
+  })
+  .then(pageHTML => {
+    return writeFile(pageHTML);
+  })
+  .catch(err => {
+ console.log(err);
+  });
